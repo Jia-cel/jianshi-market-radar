@@ -129,9 +129,8 @@ async function getAllStocks(validCodes = null) {
  */
 function fetchEMBoard(type, pz = 80) {
   return new Promise((resolve) => {
-    const get = require('http').get;
-    const url = `http://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=${pz}&po=1&np=1&fltt=2&invt=2&fid=f3&fs=m:90+t:${type}&fields=f2,f3,f4,f12,f14,f20,f104,f105,f128,f152`;
-    const req = get(url, {
+    const url = `https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=${pz}&po=1&np=1&fltt=2&invt=2&fid=f3&fs=m:90+t:${type}&fields=f2,f3,f4,f12,f14,f20,f104,f105,f128,f152`;
+    const req = https.get(url, {
       headers: { 'User-Agent': 'Mozilla/5.0' },
       timeout: 10000
     }, (res) => {
