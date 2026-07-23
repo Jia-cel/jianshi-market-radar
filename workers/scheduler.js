@@ -122,8 +122,8 @@ function buildSectorsFromEM(stocks, emSectors, emConcepts) {
         turnoverRate: '0', breadth,
         momentum: Math.min(100, Math.max(10, 40 + avg * 5)),
         days: Math.ceil(Math.abs(avg) / 0.5) || 1,
-        stage: avgChange > 3 ? '高潮' : avgChange > 1.5 ? '发酵' : avgChange > 0.5 ? '启动' : avgChange > -0.5 ? '潜伏' : '退潮',
-        stageTone: avgChange > 3 ? 'hot' : avgChange > 1.5 ? 'hot' : avgChange > 0.5 ? 'up' : avgChange > -0.5 ? 'quiet' : 'down',
+        stage: avg > 3 ? '高潮' : avg > 1.5 ? '发酵' : avg > 0.5 ? '启动' : avg > -0.5 ? '潜伏' : '退潮',
+        stageTone: avg > 3 ? 'hot' : avg > 1.5 ? 'hot' : avg > 0.5 ? 'up' : avg > -0.5 ? 'quiet' : 'down',
         catalyst: '行业聚合', keywords: [name],
         spark: Array.from({ length: 10 }, () => Math.round(20 + Math.random() * 70))
       };
