@@ -52,7 +52,7 @@ async function analyzeChartPattern(imageBase64, imageType = 'image/png') {
   const qwenClient = getQwen();
   if (!qwenClient) return { success: false, error: '请先配置通义千问 API Key' };
   const response = await qwenClient.chat.completions.create({
-    model: 'qwen-vl-max',
+    model: 'qwen3-vl-plus',
     messages: [{
       role: 'user',
       content: [
