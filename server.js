@@ -113,6 +113,16 @@ server.listen(PORT, () => {
   console.log(`   SMS 开发模式: ${process.env.SMS_DEV_MODE === 'true' ? '✅ 开启（验证码打印到控制台）' : '❌ 关闭'}\n`);
 });
 
+// Render 防休眠：每 10 分钟自 ping 一次，防止免费版 15 分钟无流量自动休眠
+const RENDER_URL = process.env.RENDER_URL || `http://localhost:${PORT}`;
+setInterval(() => {
+  const http = require('http');
+  http.get(RENDER_URL + '/api/data/cache-stats', res => {
+    // 静默，仅保持连接活跃
+  }).on('error', () => {});
+}, 10 * 60 * 1000);
+console.log('  [Heartbeat] 防休眠已启用 (每10分钟)');
+
 // 优雅退出
 process.on('SIGINT', () => {
   console.log('\nShutting down...');
