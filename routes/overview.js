@@ -5,7 +5,10 @@ const router = express.Router();
 // 交易日判断工具
 // ============================================================
 function getTradingStatus() {
-  const now = new Date();
+  // 使用北京时间（Render 服务器时区为 UTC）
+  const opts = { timeZone: 'Asia/Shanghai', hour12: false };
+  const s = new Date().toLocaleString('en-US', opts);
+  const now = new Date(s);
   const day = now.getDay(); // 0=周日, 6=周六
   const hour = now.getHours();
   const minute = now.getMinutes();

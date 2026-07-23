@@ -11,6 +11,16 @@ const { setCache } = require('../services/cache');
 const { buildOverview } = require('../services/market-engine');
 let snapshotWorker = null; // 延迟加载
 
+// 北京时间工具（Render 服务器时区为 UTC）
+function beijingNow() {
+  const opts = { timeZone: 'Asia/Shanghai', hour12: false };
+  const s = new Date().toLocaleString('en-US', opts);
+  return new Date(s);
+}
+function beijingHour() { return beijingNow().getHours(); }
+function beijingMinute() { return beijingNow().getMinutes(); }
+function beijingDateStr() { return beijingNow().toISOString().slice(0, 10); }
+
 let isRunning = false;
 let lastFetchMinute = null;
 let stockBasicCache = []; // 缓存股票基本信息
@@ -128,7 +138,7 @@ const financialDataCache = {}; // tsCode → {profitTrend, revenueTrend, cashflo
 
 async function fetchFinancials(candidates) {
   // 跨天清空（必须在 early return 之前）
-  const today = new Date().toISOString().slice(0, 10);
+  const today = beijingDateStr();
   if (fetchedFinancials._date !== today) {
     fetchedFinancials.clear();
     Object.keys(financialDataCache).forEach(k => delete financialDataCache[k]);
@@ -272,7 +282,7 @@ async function refreshData() {
       industry: s.industry
     }));
 
-    const overview = buildOverview(adapted, sectors, new Date().toISOString().slice(0, 10), stockBasicCache);
+    const overview = buildOverview(adapted, sectors, beijingDateStr(), stockBasicCache);
 
     // 4. 候选股池：多元化选股（非涨停领涨 + 成交龙头 + 板块代表）
     // 构建板块热度映射（用于催化评分）
@@ -380,8 +390,8 @@ async function refreshData() {
     overview.market.status = '盘中实时';
     overview.market.temperature = Math.round(40 + stocks.filter(s => s.pctChg > 0).length / stocks.length * 50);
     // 从实时涨幅分布生成市场脉搏（时间序列累积）
-    const now = new Date();
-    const todayStr = now.toISOString().slice(0, 10);
+    const now = beijingNow();
+    const todayStr = beijingDateStr();
     // 从 DB 加载历史脉搏（跨重启保留）
     if (!pulseLoaded) {
       pulseLoaded = true;
@@ -452,7 +462,7 @@ async function refreshData() {
       snapshotWorker.syncCandidates(overview.candidates);
     } catch { /* snapshot worker 可选 */ }
 
-    lastFetchMinute = new Date().getMinutes();
+    lastFetchMinute = beijingMinute();
     const elapsed = Date.now() - t0;
     addLog(`刷新完成 (${elapsed}ms) 温度:${overview.market.temperature} 涨:${overview.market.up} 跌:${overview.market.down}`);
 
@@ -470,10 +480,9 @@ function startScheduler() {
   refreshData();
 
   setInterval(() => {
-    const now = new Date();
-    const hour = now.getHours();
-    const minute = now.getMinutes();
-    // 开盘时段 9:00-15:05
+    const hour = beijingHour();
+    const minute = beijingMinute();
+    // 北京时间 9:00-15:05 为开盘时段
     const isMarketHours = hour >= 9 && hour <= 15 && !(hour === 15 && minute > 5);
     if (isMarketHours && minute !== lastFetchMinute) {
       refreshData();
