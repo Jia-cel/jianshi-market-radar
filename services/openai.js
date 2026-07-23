@@ -51,6 +51,17 @@ async function analyzeChartPattern(imageBase64, imageType = 'image/png') {
 
   const qwenClient = getQwen();
   if (!qwenClient) return { success: false, error: '请先配置通义千问 API Key' };
+
+  // 确保 imageBase64 是纯 base64（不含 data:xxx;base64, 前缀）
+  let cleanBase64 = imageBase64;
+  if (cleanBase64.includes(',')) {
+    cleanBase64 = cleanBase64.split(',')[1] || cleanBase64;
+  }
+  // 确保只包含有效 base64 字符
+  if (!/^[A-Za-z0-9+/=]+$/.test(cleanBase64.replace(/\s/g, ''))) {
+    return { success: false, error: '图片格式无效，请重新上传' };
+  }
+
   const response = await qwenClient.chat.completions.create({
     model: 'qwen3-vl-plus',
     messages: [{
@@ -58,7 +69,7 @@ async function analyzeChartPattern(imageBase64, imageType = 'image/png') {
       content: [
         {
           type: 'image_url',
-          image_url: { url: `data:${imageType};base64,${imageBase64}` }
+          image_url: { url: `data:${imageType};base64,${cleanBase64.replace(/\s/g, '')}` }
         },
         {
           type: 'text',
