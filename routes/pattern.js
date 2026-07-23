@@ -13,13 +13,11 @@ const router = express.Router();
 // 每用户每天限制 20 次
 const dailyLimits = new Map();
 
-function checkLimit(userId) {
+function checkLimit(ip) {
   const today = new Date().toISOString().slice(0, 10);
-  const key = `${userId}:${today}`;
+  const key = `${ip}:${today}`;
   const count = dailyLimits.get(key) || 0;
-  if (count >= 20) {
-    return false;
-  }
+  if (count >= 20) return false;
   dailyLimits.set(key, count + 1);
   return true;
 }
@@ -31,7 +29,8 @@ router.post('/analyze', async (req, res) => {
     return res.status(400).json({ error: '请提供 K 线图片' });
   }
 
-  if (!checkLimit(req.user.id)) {
+  const clientIp = req.ip || req.socket?.remoteAddress || 'unknown';
+  if (!checkLimit(clientIp)) {
     return res.status(429).json({ error: '今日识别次数已用完（20次/天）' });
   }
 
