@@ -1,16 +1,27 @@
 const OpenAI = require('openai');
 
-// DeepSeek（文本分析）
-const deepseek = new OpenAI({
-  baseURL: 'https://api.deepseek.com/v1',
-  apiKey: process.env.DEEPSEEK_API_KEY || ''
-});
+let deepseek = null;
+let qwen = null;
 
-// 通义千问 VL（图像识别）
-const qwen = new OpenAI({
-  baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-  apiKey: process.env.QWEN_API_KEY || ''
-});
+function getDeepSeek() {
+  if (!deepseek && process.env.DEEPSEEK_API_KEY) {
+    deepseek = new OpenAI({
+      baseURL: 'https://api.deepseek.com/v1',
+      apiKey: process.env.DEEPSEEK_API_KEY
+    });
+  }
+  return deepseek;
+}
+
+function getQwen() {
+  if (!qwen && process.env.QWEN_API_KEY) {
+    qwen = new OpenAI({
+      baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      apiKey: process.env.QWEN_API_KEY
+    });
+  }
+  return qwen;
+}
 
 let totalTokens = 0;
 
@@ -18,7 +29,9 @@ let totalTokens = 0;
  * 文本对话（DeepSeek-V4）
  */
 async function chat(messages, { maxTokens = 800, temperature = 0.5 } = {}) {
-  const response = await deepseek.chat.completions.create({
+  const client = getDeepSeek();
+  if (!client) throw new Error('DeepSeek API key not configured');
+  const response = await client.chat.completions.create({
     model: 'deepseek-v4-pro',
     messages,
     max_tokens: maxTokens,
@@ -36,7 +49,9 @@ async function analyzeChartPattern(imageBase64, imageType = 'image/png') {
     return { success: false, error: '请先配置通义千问 API Key' };
   }
 
-  const response = await qwen.chat.completions.create({
+  const qwenClient = getQwen();
+  if (!qwenClient) return { success: false, error: '请先配置通义千问 API Key' };
+  const response = await qwenClient.chat.completions.create({
     model: 'qwen-vl-max',
     messages: [{
       role: 'user',
