@@ -335,8 +335,8 @@ async function poll() {
 
     // 5. 合并告警（去重 + 限流）
     if (newAlerts.length > 0) {
-      // 去重：同一只股票同一标题 3 秒内不重复（跟上快照节奏）
-      const cutoff = Date.now() - 3000;
+      // 去重：同一只股票同一标题 15 秒内不重复
+      const cutoff = Date.now() - 15000;
       const seen = new Set();
       for (const a of liveAlerts) {
         if (a._at > cutoff) seen.add(a.code + '|' + a.title);
