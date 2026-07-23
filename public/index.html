@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#08111f" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%230d2830%22/><path d=%22M15 42 27 29l9 8 14-20%22 fill=%22none%22 stroke=%22%2325d4c4%22 stroke-width=%225%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>" />
+  <title>见势 · A股热点雷达</title>
+  <link rel="stylesheet" href="/styles.css?v=1" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 44 44"><path d="M10 29.5 18.2 21l5.7 5.3L34 14"/><path class="brand-dot" d="M34 14h-5.5M34 14v5.5"/></svg>
+        </div>
+        <div><strong>见势</strong><span>A股热点雷达</span></div>
+      </div>
+      <nav class="main-nav" aria-label="主导航">
+        <p>研究台</p>
+        <button class="nav-item active" data-page="overview"><span data-icon="layout"></span><span>市场总览</span></button>
+        <button class="nav-item" data-page="sectors"><span data-icon="layers"></span><span>热点板块</span><b>6</b></button>
+        <button class="nav-item" data-page="patterns"><span data-icon="scan"></span><span>形态搜索</span></button>
+        <button class="nav-item" data-page="stocks"><span data-icon="telescope"></span><span>候选个股</span><b>4</b></button>
+        <p>决策台</p>
+        <button class="nav-item" data-page="financials"><span data-icon="report"></span><span>财报分析</span></button>
+        <button class="nav-item" data-page="monitor"><span data-icon="activity"></span><span>盘中监控</span><i class="live-dot"></i></button>
+        <button class="nav-item" data-page="risk"><span data-icon="shield"></span><span>风险控制</span></button>
+        <button class="nav-item" data-page="review"><span data-icon="history"></span><span>复盘回测</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="source-card">
+          <div class="source-row"><span class="source-pulse"></span><span>数据源就绪</span></div>
+          <small>Tushare + 新浪财经</small>
+          <div class="source-meter"><i></i></div>
+        </div>
+        <div class="user-info" id="sidebarUser" style="display:none; margin-top:8px; font-size:10px; color:var(--muted); padding:0 8px;">
+          <span>👤 </span><span id="sidebarPhone"></span>
+        </div>
+        <button class="settings" id="logoutButton" style="display:none;"><span data-icon="settings"></span><span>退出登录</span></button>
+        <button class="settings" id="settingsButton"><span data-icon="settings"></span><span>系统设置</span></button>
+      </div>
+    </aside>
+    <main class="workspace">
+      <header class="topbar">
+        <div class="page-title">
+          <button class="icon-button mobile-menu-button" id="mobileMenuButton" aria-label="打开导航" aria-expanded="false"><span class="hamburger" aria-hidden="true"></span></button>
+          <div class="mobile-brand">见势</div>
+          <h1>市场总览</h1>
+          <span class="market-status"><i></i>实时监控中</span>
+        </div>
+        <div class="top-actions">
+          <div class="simulation-pill"><span data-icon="flask"></span>实时行情</div>
+          <button class="icon-button" id="refreshButton" aria-label="刷新"><span data-icon="refresh"></span></button>
+          <span class="update-time" id="updateTime" title="数据更新时间">--:--:--</span>
+          <button class="icon-button notification-button" id="notificationButton" aria-label="通知中心" aria-expanded="false"><span data-icon="bell"></span><i></i></button>
+          <div class="avatar" id="headerAvatar">研</div>
+        </div>
+      </header>
+      <section class="content" id="appContent">
+        <div class="loading-state">
+          <div class="loading-ring"></div>
+          <p>正在载入市场脉搏…</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <button class="page-backdrop" id="pageBackdrop" aria-label="关闭弹层" hidden></button>
+  <aside class="control-drawer" id="controlDrawer" aria-hidden="true" aria-label="控制面板"></aside>
+  <div id="toastRegion" class="toast-region" aria-live="polite"></div>
+  <script type="module" src="/app.js?v=27"></script>
+</body>
+</html>
