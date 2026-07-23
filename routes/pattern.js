@@ -5,7 +5,6 @@
  */
 
 const express = require('express');
-const { authRequired } = require('../middleware/auth');
 const { analyzeChartPattern } = require('../services/openai');
 const { makeKey, getAiCache, setAiCache } = require('../services/ai-cache');
 
@@ -25,7 +24,7 @@ function checkLimit(userId) {
   return true;
 }
 
-router.post('/analyze', authRequired, async (req, res) => {
+router.post('/analyze', async (req, res) => {
   const { imageBase64, imageType } = req.body;
 
   if (!imageBase64) {

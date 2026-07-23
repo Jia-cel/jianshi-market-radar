@@ -2,77 +2,14 @@
 // 见势 · A股热点雷达 — 前端应用
 // ============================================================
 
-// ---- Token 检查 ----
-const AUTH_TOKEN = localStorage.getItem('jianshi_token');
-if (!AUTH_TOKEN) {
-  window.location.href = '/login';
-}
-
-// ---- 带鉴权的 fetch 封装 ----
+// ---- fetch 封装 ----
 async function apiFetch(url, options = {}) {
-  const headers = {
-    ...options.headers,
-    'Authorization': 'Bearer ' + AUTH_TOKEN
-  };
-  const response = await fetch(url, { ...options, headers });
-  if (response.status === 401) {
-    localStorage.removeItem('jianshi_token');
-    localStorage.removeItem('jianshi_user');
-    window.location.href = '/login';
-  }
+  const response = await fetch(url, options);
   return response;
 }
 
-// ---- 用户信息 ----
-const currentUser = JSON.parse(localStorage.getItem('jianshi_user') || '{}');
-if (currentUser.phone) {
-  document.getElementById('sidebarPhone').textContent = currentUser.phone;
-  document.getElementById('sidebarUser').style.display = 'block';
-  document.getElementById('logoutButton').style.display = 'block';
-  document.getElementById('headerAvatar').textContent = currentUser.phone.slice(-2) || '研';
-}
-
-// ---- 退出登录 ----
-document.getElementById('logoutButton').addEventListener('click', () => {
-  localStorage.removeItem('jianshi_token');
-  localStorage.removeItem('jianshi_user');
-  window.location.href = '/login';
-});
-
-// ---- 从服务端加载用户设置 ----
-async function loadUserSettings() {
-  try {
-    const r = await apiFetch('/api/auth/me');
-    if (!r.ok) return;
-    const data = await r.json();
-    if (data.user && data.user.settings && Object.keys(data.user.settings).length > 0) {
-      const saved = data.user.settings;
-      controls = {
-        ...defaultControls,
-        ...saved,
-        monitorRules: { ...defaultControls.monitorRules, ...(saved.monitorRules || {}) },
-        risk: { ...defaultControls.risk, ...(saved.risk || {}) },
-        pattern: { ...defaultControls.pattern, ...(saved.pattern || {}) },
-        recentAlerts: Array.isArray(saved.recentAlerts) ? saved.recentAlerts.slice(0, 20) : []
-      };
-    }
-  } catch {
-    // 加载失败则使用本地设置
-  }
-}
-
-// ---- 保存用户设置到服务端 ----
-async function saveUserSettings() {
-  try {
-    await apiFetch('/api/auth/me/settings', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ settings: controls })
-    });
-  } catch {
-    // 静默失败
-  }
-  // 同时存本地作为备份
+// ---- 保存设置到本地 ----
+function saveUserSettings() {
   localStorage.setItem(storageKey, JSON.stringify(controls));
 }
 
@@ -887,7 +824,6 @@ async function silentRefresh() {
 }
 
 (async function init() {
-  await loadUserSettings();
   activePage = sessionStorage.getItem('jianshi-active-page') || 'overview';
   document.body.classList.toggle('compact-mode', controls.compactMode);
   updateNotificationBadge();

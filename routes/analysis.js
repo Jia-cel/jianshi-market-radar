@@ -5,7 +5,6 @@
  */
 
 const express = require('express');
-const { authRequired } = require('../middleware/auth');
 const { generateMarketAnalysis, analyzeFinancials, getUsageStats } = require('../services/openai');
 const { makeKey, getAiCache, setAiCache } = require('../services/ai-cache');
 const { getCache } = require('../services/cache');
@@ -16,7 +15,7 @@ const router = express.Router();
  * POST /api/analysis/market
  * 生成 AI 市场分析
  */
-router.post('/market', authRequired, async (req, res) => {
+router.post('/market', async (req, res) => {
   // 从缓存获取当前市场数据
   const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   let marketData = req.body;
@@ -61,7 +60,7 @@ router.post('/market', authRequired, async (req, res) => {
  * POST /api/analysis/financial
  * 财报 AI 解读
  */
-router.post('/financial', authRequired, async (req, res) => {
+router.post('/financial', async (req, res) => {
   const { stockName, stockCode, profitTrend, revenueTrend } = req.body;
 
   if (!stockName || !stockCode || !profitTrend) {

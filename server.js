@@ -17,7 +17,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 initSchema();
 
 // API 路由
-app.use('/api/auth', require('./routes/auth'));
 app.use('/api/overview', require('./routes/overview'));
 app.use('/api/data', require('./routes/data'));
 app.use('/api/pattern', require('./routes/pattern'));     // AI 形态识别
@@ -92,11 +91,6 @@ app.get('/api/stream', (req, res) => {
 });
 
 // SPA 回退路由
-// SPA 回退路由（Express 5 用 app.use 处理通配）
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-
 app.use((req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API not found' });
