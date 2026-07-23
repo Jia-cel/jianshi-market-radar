@@ -1,6 +1,7 @@
 const express = require('express');
 const { getCache, setCache, getCacheStats } = require('../services/cache');
 const { getDailyData } = require('../services/tushare');
+const { authRequired } = require('../middleware/auth');
 const router = express.Router();
 
 /**
@@ -106,7 +107,7 @@ router.get('/snapshot-status', (req, res) => {
  * GET /api/data/refresh
  * 手动触发数据刷新（调试用，浏览器可直接访问）
  */
-router.get('/refresh', async (req, res) => {
+router.get('/refresh', authRequired, async (req, res) => {
   const { refreshData, getStatus } = require('../workers/scheduler');
   const status = getStatus();
   // 同步执行，返回日志给浏览器
