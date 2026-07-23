@@ -57,19 +57,22 @@ async function analyzeChartPattern(imageBase64, imageType = 'image/png') {
   if (cleanBase64.includes(',')) {
     cleanBase64 = cleanBase64.split(',')[1] || cleanBase64;
   }
-  // 确保只包含有效 base64 字符
-  if (!/^[A-Za-z0-9+/=]+$/.test(cleanBase64.replace(/\s/g, ''))) {
-    return { success: false, error: '图片格式无效，请重新上传' };
+  cleanBase64 = cleanBase64.replace(/\s/g, '');
+  // 通过 Buffer 往返确保纯 ASCII base64
+  try {
+    cleanBase64 = Buffer.from(cleanBase64, 'base64').toString('base64');
+  } catch {
+    return { success: false, error: '图片数据无效' };
   }
 
   const response = await qwenClient.chat.completions.create({
-    model: 'qwen3-vl-plus',
+    model: 'qwen-vl-max',
     messages: [{
       role: 'user',
       content: [
         {
           type: 'image_url',
-          image_url: { url: `data:${imageType};base64,${cleanBase64.replace(/\s/g, '')}` }
+          image_url: { url: `data:${imageType};base64,${cleanBase64}` }
         },
         {
           type: 'text',
