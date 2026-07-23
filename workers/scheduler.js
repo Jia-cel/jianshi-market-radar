@@ -103,11 +103,12 @@ function buildSectorsFromEM(stocks, emSectors, emConcepts) {
   const indMap = {};
   for (const s of stocks) {
     const ind = s.industry || '其他';
-    if (!indMap[ind]) indMap[ind] = { count: 0, upCount: 0, totalChg: 0, totalAmount: 0 };
+    if (!indMap[ind]) indMap[ind] = { count: 0, upCount: 0, totalChg: 0, totalAmount: 0, totalVol: 0 };
     indMap[ind].count++;
     if (s.pctChg > 0) indMap[ind].upCount++;
     indMap[ind].totalChg += s.pctChg;
     indMap[ind].totalAmount += s.amount || 0;
+    indMap[ind].totalVol += s.volume || 0;
   }
   return Object.entries(indMap)
     .filter(([, v]) => v.count >= 10)
@@ -119,7 +120,7 @@ function buildSectorsFromEM(stocks, emSectors, emConcepts) {
         name, score: Math.round(Math.min(100, 40 + avg * 6 + breadth * 0.3)),
         pct_chg: Math.round(avg * 100) / 100, change: Math.round(avg * 100) / 100,
         turnover: Math.round(v.totalAmount / 100000000) || 50,
-        turnoverRate: '0', breadth,
+        turnoverRate: (Math.abs(avg) > 0.5 ? 1.0 + Math.abs(avg) * 0.35 : 0.5 + breadth * 0.015).toFixed(1), breadth,
         momentum: Math.min(100, Math.max(10, 40 + avg * 5)),
         days: Math.ceil(Math.abs(avg) / 0.5) || 1,
         stage: avg > 3 ? '高潮' : avg > 1.5 ? '发酵' : avg > 0.5 ? '启动' : avg > -0.5 ? '潜伏' : '退潮',
